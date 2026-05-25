@@ -77,48 +77,59 @@ RegisterNumber:  212225220109
 */
 ```
 ```
-# Ex:No 4
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+from sklearn.multioutput import MultiOutputRegressor
 
-import numpy as np
+data = {
+    'Size': [1000, 1200, 1500, 1800, 2000],
+    'Bedrooms': [2, 2, 3, 3, 4],
+    'Price': [300000, 350000, 400000, 450000, 500000],
+    'Occupants': [2, 3, 4, 5, 6]
+}
 
-X = np.array([
-    [2, 80, 50],
-    [3, 60, 40],
-    [5, 90, 70],
-    [7, 85, 80],
-    [9, 95, 90]
-], dtype=float)
+df = pd.DataFrame(data)
 
-y = np.array([50, 45, 70, 80, 95], dtype=float)
+X = df[['Size', 'Bedrooms']]
 
-X_mean = X.mean(axis=0)
-X_std = X.std(axis=0)
-X = (X - X_mean) / X_std
+y = df[['Price', 'Occupants']]
 
-X = np.c_[np.ones(X.shape[0]), X]  # shape becomes (n_samples, n_features + 1)
+model = MultiOutputRegressor(SGDRegressor())
 
-n_features = X.shape[1]
-weights = np.zeros(n_features)
+model.fit(X, y)
 
-learning_rate = 0.01
-epochs = 1000
-for epoch in range(epochs):
-    for i in range(X.shape[0]):
-        xi = X[i]
-        yi = y[i]
-        y_pred = np.dot(xi, weights)
-        error = y_pred - yi
-        # Update weights
-        weights -= learning_rate * error * xi
+prediction = model.predict([[1600, 3]])
 
-print("Trained Weights (including intercept):", weights)
+print("Predicted Price:", prediction[0][0])
+print("Predicted Occupants:", prediction[0][1])
 
-y_pred_all = np.dot(X, weights)
-print("Predicted values:", y_pred_all)
+plt.scatter(df['Size'], df['Price'])
+
+plt.plot(df['Size'], model.predict(X)[:,0])
+
+plt.xlabel("House Size")
+plt.ylabel("House Price")
+plt.title("House Price Prediction")
+
+plt.show()
+
+plt.scatter(df['Size'], df['Occupants'])
+
+plt.plot(df['Size'], model.predict(X)[:,1])
+
+plt.xlabel("House Size")
+plt.ylabel("Occupants")
+plt.title("Occupants Prediction")
+
+plt.show()
 ```
 ## Output:
 
-<img width="988" height="92" alt="image" src="https://github.com/user-attachments/assets/0218a1ab-16e3-447f-a411-dcb079c9bdb7" />
+<img width="425" height="62" alt="image" src="https://github.com/user-attachments/assets/087819af-b94e-4386-a807-de4651ba18fd" />
+<img width="793" height="569" alt="image" src="https://github.com/user-attachments/assets/ac55405d-1b0e-463b-b5cf-58c5f78dde19" />
+<img width="770" height="584" alt="image" src="https://github.com/user-attachments/assets/c7ed8ed4-0d8b-486e-acaf-e4e613ebcab7" />
+
 
 
 ## Result:
